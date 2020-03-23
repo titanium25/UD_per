@@ -54,19 +54,14 @@ public class PetController {
 
     @GetMapping
     public List<PetDTO> getPets(){
-        List<Pet> pets = petService.getAllPets();
-        return pets.stream().map(petDTO -> convertService.petToDTO(petDTO)).collect(Collectors.toList());
+        List<Pet> petList = petService.getAllPets();
+        return petList.stream().map(petDTO -> convertService.petToDTO(petDTO)).collect(Collectors.toList());
     }
 
     @GetMapping("/owner/{ownerId}")
     public List<PetDTO> getPetsByOwner(@PathVariable long ownerId) {
-        List<PetDTO> listOfPetsDTO = new ArrayList<>();
         List<Pet> listOfPets = petService.getPetsByOwnerId(ownerId);
-        for(Pet p : listOfPets){
-            PetDTO dto = convertService.petToDTO(p);
-            listOfPetsDTO.add(dto);
-        }
-        return listOfPetsDTO;
+        return listOfPets.stream().map(petDTO -> convertService.petToDTO(petDTO)).collect(Collectors.toList());
     }
 
 

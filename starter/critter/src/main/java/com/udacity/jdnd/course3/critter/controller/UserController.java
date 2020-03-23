@@ -53,16 +53,16 @@ public class UserController {
 
     @GetMapping("/customer")
     public List<CustomerDTO> getAllCustomers(){
-        List<Customer> customers = customerService.getAllCustomers();
-        return customers.stream().map(customerDTO -> convertService.customerToDTO(customerDTO)).collect(Collectors.toList());
+        List<Customer> allCustomers = customerService.getAllCustomers();
+        return allCustomers.stream().map(customerDTO -> convertService.customerToDTO(customerDTO)).collect(Collectors.toList());
     }
 
     @GetMapping("/customer/pet/{petId}")
     public CustomerDTO getOwnerByPet(@PathVariable long petId) {
         Pet pet = petService.getPet(petId);
         CustomerDTO dto = convertService.customerToDTO(pet.getOwner());
-        List<Long> petIds = Collections.singletonList(pet.getId());
-        dto.setPetIds(petIds);
+        List<Long> petsIdList = Collections.singletonList(pet.getId());
+        dto.setPetIds(petsIdList);
         return dto;
     }
 

@@ -1,44 +1,66 @@
 package com.udacity.jdnd.course3.critter.entity;
 
 import javax.persistence.*;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Entity
 public class Schedule {
     @Id
-    @GeneratedValue
-    private Long scheduleId;
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private long id;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Employee> employees;
-    @ManyToMany
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Pet> pets;
 
-    private LocalDate deliveryTime;
+    private LocalDate date;
+
     @ElementCollection(targetClass = EmployeeSkill.class)
     @Enumerated(EnumType.STRING)
-    @CollectionTable(
-            name = "ScheduleActivitiesTable",
-            joinColumns = @JoinColumn(name = "scheduleId")
-    )
-    @Column(name = "activity")
-    private Set<EmployeeSkill> activities= new HashSet<>();
+    private Set<EmployeeSkill> activities;
 
-    public Long getId(){ return scheduleId;}
-    public void setId(Long id){ this.scheduleId = id;}
+    public long getId() {
+        return id;
+    }
 
-    public List<Employee> getEmployees(){ return employees;}
-    public void setEmployees(List<Employee> employees){ this.employees = employees;}
+    public void setId(long id) {
+        this.id = id;
+    }
 
-    public List<Pet> getPets(){ return pets;}
-    public void setPets(List<Pet> pets){ this.pets = pets;}
+    public List<Employee> getEmployees() {
+        return employees;
+    }
 
-    public LocalDate getDeliveryTime(){ return deliveryTime;}
-    public void setDeliveryTime(LocalDate time){ this.deliveryTime = time;}
+    public void setEmployees(List<Employee> employees) {
+        this.employees = employees;
+    }
 
-    public Set<EmployeeSkill> getActivities(){ return activities;}
-    public void setActivities(Set<EmployeeSkill> activities){ this.activities = activities;}
+    public List<Pet> getPets() {
+        return pets;
+    }
+
+    public void setPets(List<Pet> pets) {
+        this.pets = pets;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public Set<EmployeeSkill> getActivities() {
+        return activities;
+    }
+
+    public void setActivities(Set<EmployeeSkill> activities) {
+        this.activities = activities;
+    }
 }

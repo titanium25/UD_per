@@ -18,7 +18,7 @@ public class ScheduleService {
 
     public Long save(Schedule schedule){ return scheduleRepository.save(schedule).getId();}
 
-    public Schedule getScheduleById(Long id){ return scheduleRepository.findScheduleByScheduleId(id);}
+    public Schedule getScheduleById(Long id){ return scheduleRepository.findScheduleById(id);}
 
     public List<Schedule> getSchedules() { return scheduleRepository.findAll();}
 

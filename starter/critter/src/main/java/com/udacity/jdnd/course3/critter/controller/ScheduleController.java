@@ -32,28 +32,28 @@ public class ScheduleController {
 
     @PostMapping
     public ScheduleDTO createSchedule(@RequestBody ScheduleDTO scheduleDTO) {
-        scheduleService.save(convertService.DTOtoSchedule(scheduleDTO));
+        scheduleService.save(convertService.dtoToSchedule(scheduleDTO));
         return scheduleDTO;
     }
 
     @GetMapping
     public List<ScheduleDTO> getAllSchedules() {
         List<Schedule> schedules = scheduleService.getSchedules();
-        return schedules.stream().map(schedule -> convertService.ScheduleToDTO(schedule)).collect(Collectors.toList());
+        return schedules.stream().map(schedule -> convertService.scheduleToDTO(schedule)).collect(Collectors.toList());
     }
 
     @GetMapping("/pet/{petId}")
     public List<ScheduleDTO> getScheduleForPet(@PathVariable long petId) {
         Pet pet = petService.getPet(petId);
         List<Schedule> schedules = scheduleService.getScheduleByPet(pet);
-        return schedules.stream().map(schedule -> convertService.ScheduleToDTO(schedule)).collect(Collectors.toList());
+        return schedules.stream().map(schedule -> convertService.scheduleToDTO(schedule)).collect(Collectors.toList());
     }
 
     @GetMapping("/employee/{employeeId}")
     public List<ScheduleDTO> getScheduleForEmployee(@PathVariable long employeeId) {
         Employee employee = employeeService.getEmployee(employeeId);
         List<Schedule> schedules = scheduleService.getScheduleByEmployee(employee);
-        return schedules.stream().map(schedule -> convertService.ScheduleToDTO(schedule)).collect(Collectors.toList());
+        return schedules.stream().map(schedule -> convertService.scheduleToDTO(schedule)).collect(Collectors.toList());
     }
 
     @GetMapping("/customer/{customerId}")
@@ -61,6 +61,6 @@ public class ScheduleController {
         Customer customer = customerService.getCustomer(customerId);
         List<Pet> pets = petService.getPetsByCustomer(customer);
         List<Schedule> schedules = scheduleService.getSchedulesByPet(pets);
-        return schedules.stream().map(schedule -> convertService.ScheduleToDTO(schedule)).collect(Collectors.toList());
+        return schedules.stream().map(schedule -> convertService.scheduleToDTO(schedule)).collect(Collectors.toList());
     }
 }

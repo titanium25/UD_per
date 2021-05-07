@@ -1,6 +1,10 @@
 package com.udacity.jdnd.course3.critter.service;
 
+import com.udacity.jdnd.course3.critter.DTO.CustomerDTO;
+import com.udacity.jdnd.course3.critter.DTO.EmployeeDTO;
+import com.udacity.jdnd.course3.critter.DTO.PetDTO;
 import com.udacity.jdnd.course3.critter.DTO.ScheduleDTO;
+import com.udacity.jdnd.course3.critter.entity.Customer;
 import com.udacity.jdnd.course3.critter.entity.Employee;
 import com.udacity.jdnd.course3.critter.entity.Pet;
 import com.udacity.jdnd.course3.critter.entity.Schedule;
@@ -23,7 +27,7 @@ public class ConvertService {
     @Autowired
     CustomerService customerService;
 
-    public Schedule DTOtoSchedule(ScheduleDTO scheduleDTO){
+    public Schedule dtoToSchedule(ScheduleDTO scheduleDTO){
         Schedule schedule = new Schedule();
         BeanUtils.copyProperties(scheduleDTO, schedule);
 
@@ -52,7 +56,7 @@ public class ConvertService {
         return schedule;
     }
 
-    public ScheduleDTO ScheduleToDTO(Schedule schedule) {
+    public ScheduleDTO scheduleToDTO(Schedule schedule) {
         ScheduleDTO scheduleDTO = new ScheduleDTO();
         BeanUtils.copyProperties(schedule, scheduleDTO);
         List<Employee> listOfEmployees = schedule.getEmployees();
@@ -62,5 +66,63 @@ public class ConvertService {
         scheduleDTO.setEmployeeIds(eIds);
         scheduleDTO.setPetIds(pIds);
         return scheduleDTO;
+    }
+
+    public PetDTO petToDTO(Pet pet){
+        PetDTO petDTO = new PetDTO();
+        BeanUtils.copyProperties(pet, petDTO);
+        if(pet.getOwner() != null){
+            petDTO.setOwnerId(pet.getOwner().getId());
+        }
+        return petDTO;
+    }
+
+    public Pet dtoToPet(PetDTO petDTO){
+        Pet pet = new Pet();
+        BeanUtils.copyProperties(petDTO, pet);
+        return pet;
+    }
+
+    public CustomerDTO customerToDTO(Customer customer){
+        CustomerDTO customerDTO = new CustomerDTO();
+        BeanUtils.copyProperties(customer, customerDTO);
+        List<Pet> pets = customer.getPets();
+
+        List<Long> petIds = new ArrayList<>();
+        if(pets.size() != 0){
+            for(Pet p : pets){
+                Long id = p.getId();
+                petIds.add(id);
+            }
+        }
+        customerDTO.setPetIds(petIds);
+        return customerDTO;
+    }
+
+    public Customer dtoToCustomer(CustomerDTO customerDTO){
+        Customer customer = new Customer();
+        BeanUtils.copyProperties(customerDTO, customer);
+        List<Long> petIds = customerDTO.getPetIds();
+
+        List<Pet> pets = new ArrayList<>();
+        if(petIds != null && petIds.size() != 0){
+            for(Long id : petIds){
+                pets.add(petService.getPet(id));
+            }
+        }
+        customer.setPets(pets);
+        return customer;
+    }
+
+    public EmployeeDTO employeeToDTO(Employee employee){
+        EmployeeDTO dto = new EmployeeDTO();
+        BeanUtils.copyProperties(employee, dto);
+        return dto;
+    }
+
+    public Employee dtoToEmployee(EmployeeDTO dto){
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(dto, employee);
+        return employee;
     }
 }

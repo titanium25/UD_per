@@ -7,6 +7,7 @@ import com.udacity.jdnd.course3.critter.entity.Customer;
 import com.udacity.jdnd.course3.critter.entity.Employee;
 import com.udacity.jdnd.course3.critter.entity.EmployeeSkill;
 import com.udacity.jdnd.course3.critter.entity.Pet;
+import com.udacity.jdnd.course3.critter.service.ConvertService;
 import com.udacity.jdnd.course3.critter.service.CustomerService;
 import com.udacity.jdnd.course3.critter.service.EmployeeService;
 import com.udacity.jdnd.course3.critter.service.PetService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,6 +33,9 @@ import java.util.stream.Collectors;
 public class UserController {
 
     @Autowired
+    ConvertService convertService;
+
+    @Autowired
     private CustomerService customerService;
 
     @Autowired
@@ -41,33 +46,37 @@ public class UserController {
 
     @PostMapping("/customer")
     public CustomerDTO saveCustomer(@RequestBody CustomerDTO customerDTO){
-        Customer customer = dtc(customerDTO);
+        Customer customer = convertService.dtoToCustomer(customerDTO);
         customerService.saveCustomer(customer);
-        return ctd(customer);
+        return convertService.customerToDTO(customer);
     }
 
     @GetMapping("/customer")
     public List<CustomerDTO> getAllCustomers(){
         List<Customer> customers = customerService.getAllCustomers();
-        return customers.stream().map(customerDTO -> ctd(customerDTO)).collect(Collectors.toList());
+        return customers.stream().map(customerDTO -> convertService.customerToDTO(customerDTO)).collect(Collectors.toList());
     }
 
     @GetMapping("/customer/pet/{petId}")
-    public CustomerDTO getOwnerByPet(@PathVariable long petId){
-        throw new UnsupportedOperationException();
+    public CustomerDTO getOwnerByPet(@PathVariable long petId) {
+        Pet pet = petService.getPet(petId);
+        CustomerDTO dto = convertService.customerToDTO(pet.getOwner());
+        List<Long> petIds = Collections.singletonList(pet.getId());
+        dto.setPetIds(petIds);
+        return dto;
     }
 
     @PostMapping("/employee")
     public EmployeeDTO saveEmployee(@RequestBody EmployeeDTO employeeDTO) {
-        Employee employee = dte(employeeDTO);
+        Employee employee = convertService.dtoToEmployee(employeeDTO);
         employeeService.saveEmployee(employee);
-        return etd(employee);
+        return convertService.employeeToDTO(employee);
     }
 
     @PostMapping("/employee/{employeeId}")
     public EmployeeDTO getEmployee(@PathVariable long employeeId) {
         Employee employee = employeeService.getEmployee(employeeId);
-        return etd(employee);
+        return convertService.employeeToDTO(employee);
     }
 
     @PutMapping("/employee/{employeeId}")
@@ -84,54 +93,11 @@ public class UserController {
         List<EmployeeDTO> listOfDTO = new ArrayList<>();
         if(employeeList.size() != 0) {
             for(Employee e : employeeList){
-                EmployeeDTO dto = etd(e);
+                EmployeeDTO dto = convertService.employeeToDTO(e);
                 listOfDTO.add(dto);
             }
         }
         return listOfDTO;
     }
 
-
-    public CustomerDTO ctd(Customer customer){
-        CustomerDTO customerDTO = new CustomerDTO();
-        BeanUtils.copyProperties(customer, customerDTO);
-        List<Pet> pets = customer.getPets();
-
-        List<Long> petIds = new ArrayList<>();
-        if(pets.size() != 0){
-            for(Pet p : pets){
-                Long id = p.getId();
-                petIds.add(id);
-            }
-        }
-        customerDTO.setPetIds(petIds);
-        return customerDTO;
-    }
-
-    public Customer dtc(CustomerDTO customerDTO){
-        Customer customer = new Customer();
-        BeanUtils.copyProperties(customerDTO, customer);
-        List<Long> petIds = customerDTO.getPetIds();
-
-        List<Pet> pets = new ArrayList<>();
-        if(petIds != null && petIds.size() != 0){
-            for(Long id : petIds){
-                pets.add(petService.getPet(id));
-            }
-        }
-        customer.setPets(pets);
-        return customer;
-    }
-
-    public EmployeeDTO etd(Employee employee){
-        EmployeeDTO dto = new EmployeeDTO();
-        BeanUtils.copyProperties(employee, dto);
-        return dto;
-    }
-
-    public Employee dte(EmployeeDTO dto){
-        Employee employee = new Employee();
-        BeanUtils.copyProperties(dto, employee);
-        return employee;
-    }
 }

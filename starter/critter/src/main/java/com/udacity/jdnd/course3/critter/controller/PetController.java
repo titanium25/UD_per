@@ -9,7 +9,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Handles web requests related to Pets.
@@ -29,14 +31,13 @@ public class PetController {
         Pet pet = dtp(petDTO);
         Customer owner = null;
 
-        if(petDTO.getOwnerId() != 0) {
+        if(petDTO.getOwnerId() > 0) {
             owner = customerService.getCustomer(petDTO.getOwnerId());
             pet.setOwner(owner);
         }
         pet = petService.savePet(pet);
 
         if(owner != null){
-            System.out.println("OWNER ID IS " + owner.getId());
             owner.addPet(pet);
         }
 
@@ -45,19 +46,25 @@ public class PetController {
 
     @GetMapping("/{petId}")
     public PetDTO getPet(@PathVariable long petId) {
-        throw new UnsupportedOperationException();
+        return ptd(petService.getPet(petId));
     }
 
     @GetMapping
     public List<PetDTO> getPets(){
-        throw new UnsupportedOperationException();
+        List<Pet> pets = petService.getAllPets();
+        return pets.stream().map(petDTO -> ptd(petDTO)).collect(Collectors.toList());
     }
 
     @GetMapping("/owner/{ownerId}")
     public List<PetDTO> getPetsByOwner(@PathVariable long ownerId) {
-        throw new UnsupportedOperationException();
+        List<PetDTO> listOfPetsDTO = new ArrayList<>();
+        List<Pet> listOfPets = petService.getPetsByOwnerId(ownerId);
+        for(Pet p : listOfPets){
+            PetDTO dto = ptd(p);
+            listOfPetsDTO.add(dto);
+        }
+        return listOfPetsDTO;
     }
-
 
     private PetDTO ptd(Pet pet){
         PetDTO petDTO = new PetDTO();

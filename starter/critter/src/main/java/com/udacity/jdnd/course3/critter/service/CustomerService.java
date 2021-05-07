@@ -26,7 +26,7 @@ public class CustomerService {
             customer = byId.get();
             return customer;
         } else {
-            throw new NoSuchElementException("Employee with id:" + customerId + " can not be found");
+            throw new NoSuchElementException("Customer with id:" + customerId + " can not be found");
         }
     }
 
